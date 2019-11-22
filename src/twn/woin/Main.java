@@ -1,23 +1,29 @@
 package twn.woin;
 	
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.fxml.FXMLLoader;
+import twn.woin.ui.MainScene;
 
 
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
-		try {
-			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("MainScene.fxml"));
-			Scene scene = new Scene(root,400,400);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			primaryStage.show();
-		} catch(Exception e) {
-			e.printStackTrace();
+		Thread.setDefaultUncaughtExceptionHandler(Main::handleException);
+		MainScene.Show(primaryStage);
+	}
+	
+	public static void handleException(Thread thread, Throwable throwable){
+		throwable.printStackTrace();
+		if(Platform.isFxApplicationThread()){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText(String.format("Error! %s", throwable.getClass().getName()));
+			StringBuilder mainBuilder = new StringBuilder();
+			mainBuilder.append(throwable.getLocalizedMessage());
+			alert.setContentText(mainBuilder.toString());
+			alert.showAndWait();
 		}
 	}
 	
